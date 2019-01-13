@@ -1,0 +1,11 @@
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\bin\Debug\DoodleClassifier.exe.config
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\bin\Debug\DoodleClassifier.exe
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\bin\Debug\DoodleClassifier.pdb
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\obj\Debug\DoodleClassifier.csprojAssemblyReference.cache
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\obj\Debug\DoodleClassifier.Properties.Resources.resources
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\obj\Debug\DoodleClassifier.csproj.GenerateResource.cache
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\obj\Debug\DoodleClassifier.csproj.CoreCompileInputs.cache
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\obj\Debug\DoodleClassifier.exe
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\obj\Debug\DoodleClassifier.pdb
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\obj\Debug\DoodleClassifier.Doodle.resources
+C:\Users\PierArn\Documents\Perso\Jeux Video\C#\DoodleClassifier\DoodleClassifier\obj\Debug\DoodleClassifier.Draw.resources
