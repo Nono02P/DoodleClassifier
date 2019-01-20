@@ -76,7 +76,7 @@ namespace IA
             {
                 Matrix w = _weights[i];
                 Matrix b = _bias[i];
-                O = Matrix.Product(w, O);
+                O = Matrix.DotProduct(w, O);
                 O.Add(b);
                 O.ExecuteOnMatrix(ActivationFunctions.GetActivationFunction(ActivationFunction));
                 _neurons.Add(O);
@@ -118,7 +118,7 @@ namespace IA
                 // * Hidden[n] <-- Hidden[n - 1].
                 // * Hidden[n - 1] <-- Inputs
                 Matrix previous_Transpose = Matrix.Transpose(_neurons[i]);
-                Matrix weight_Delta = Matrix.Product(gradient, previous_Transpose);
+                Matrix weight_Delta = Matrix.DotProduct(gradient, previous_Transpose);
                 _weights[i].Add(weight_Delta);
 
                 // Ajuste le Biais de sortie par rapport à son gradient.
@@ -126,7 +126,7 @@ namespace IA
 
                 // Calcule l'erreur à appliquer sur la couche précédente.
                 Matrix weight_Transpose = Matrix.Transpose(_weights[i]);
-                error = Matrix.Product(weight_Transpose, error);
+                error = Matrix.DotProduct(weight_Transpose, error);
             }
             return new Tuple<float[], float[]> (O.Data, error.Data);
         }

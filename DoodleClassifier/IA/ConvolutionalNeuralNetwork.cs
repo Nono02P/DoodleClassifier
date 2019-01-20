@@ -381,12 +381,12 @@ namespace IA
                         gradient.Multiply(error);
                         gradient.Multiply(pLearningRate);
                         int index = 0;
-                        for (int row = 0 - Padding; row < i.Rows - Padding; row += Step)
+                        for (int row = 0 - Padding; row < i.Rows - Padding; row++)//= Step)
                         {
-                            for (int col = 0 - Padding; col < i.Columns - Padding; col += Step)
+                            for (int col = 0 - Padding; col < i.Columns - Padding; col++)//= Step)
                             {
                                 // TODO : vérifier
-                                Matrix previous = i.GetPad(O.Columns, O.Rows, col, row);
+                                Matrix previous = i.GetPad(i.Columns, i.Rows, col, row);
                                 //B.Add(gradient, index / (B.Columns - 1), index % (B.Columns - 1));
                                 _bias[idxError] += gradient.Data.Average();
                                 deltaFilter.Add(Matrix.Multiply(gradient, previous), index / (deltaFilter.Columns - 1), index % (deltaFilter.Columns - 1));
@@ -394,6 +394,7 @@ namespace IA
                                 index++;
                             }
                         }
+                        //deltaFilter.Divide(index);
                         F.Add(deltaFilter);
                     }
                     outputErrors.Add(outputError);

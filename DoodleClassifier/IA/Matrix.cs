@@ -8,6 +8,19 @@ namespace IA
     [DataContract]
     public struct Matrix
     {
+        public enum eDirection
+        {
+            Vertical,
+            Horizontal,
+        }
+
+        public enum eRotation
+        {
+            Rotation90,
+            Rotation180,
+            Rotation270,
+        }
+
         [DataMember]
         public int Rows { get; private set; }
         [DataMember]
@@ -35,19 +48,8 @@ namespace IA
         /// <returns>Nouvelle matrice correspondant au résultat de l'opération.</returns>
         public static Matrix Add(Matrix pMatrix1, Matrix pMatrix2)
         {
-            Matrix result = new Matrix(pMatrix1.Rows, pMatrix1.Columns);
-            for (int i = 0; i < pMatrix1.Rows; i++)
-            {
-                for (int j = 0; j < pMatrix1.Columns; j++)
-                {
-                    float val = 0;
-                    if (pMatrix2.Rows > i && pMatrix2.Columns > j)
-                    {
-                        val = pMatrix2.Data[i * pMatrix2.Columns + j];
-                    }
-                    result.Data[i * pMatrix1.Columns + j] = pMatrix1.Data[i * pMatrix1.Columns + j] + val;
-                }
-            }
+            Matrix result = pMatrix1.Copy();
+            result.Add(pMatrix2);
             return result;
         }
 
@@ -111,19 +113,8 @@ namespace IA
         /// <returns>Nouvelle matrice correspondant au résultat de l'opération.</returns>
         public static Matrix Subtract(Matrix pMatrix1, Matrix pMatrix2)
         {
-            Matrix result = new Matrix(pMatrix1.Rows, pMatrix1.Columns);
-            for (int i = 0; i < pMatrix1.Rows; i++)
-            {
-                for (int j = 0; j < pMatrix1.Columns; j++)
-                {
-                    float val = 0;
-                    if (pMatrix2.Rows > i && pMatrix2.Columns > j)
-                    {
-                        val = pMatrix2.Data[i * pMatrix2.Columns + j];
-                    }
-                    result.Data[i * result.Columns + j] = pMatrix1.Data[i * pMatrix1.Columns + j] - val;
-                }
-            }
+            Matrix result = pMatrix1.Copy();
+            result.Subtract(pMatrix2);
             return result;
         }
 
@@ -163,22 +154,42 @@ namespace IA
         }
 
         /// <summary>
-        /// Multiplication de chaque valeurs à chaque coordonnées de la matrice.
+        /// Multiplie deux matrices et renvoies le résultat dans une nouvelle matrice de la taille de m1.
+        /// </summary>
+        /// <param name="m1">Première matrice.</param>
+        /// <param name="m2">Deuxième matrice.</param>
+        /// <returns>Matrice de taille identique à m1 et résultante de la multiplication de m1 et m2 (valeur par valeur).</returns>
+        public static Matrix Multiply(Matrix m1, Matrix m2)
+        {
+            Matrix result = m1.Copy();
+            result.Multiply(m2);
+            return result;
+        }
+
+        /// <summary>
+        /// Multiplication de chaque valeurs à chaque coordonnées de la matrice (Produit d'Hadamard).
         /// </summary>
         /// <param name="pMatrix">Matrice qui va être multiplié (valeur par valeur).</param>
         public void Multiply(Matrix pMatrix)
         {
-            for (int i = 0; i < Rows; i++)
+            if (Columns == pMatrix.Columns && Rows == pMatrix.Rows)
             {
-                for (int j = 0; j < Columns; j++)
+                for (int i = 0; i < Rows; i++)
                 {
-                    float val = 0;
-                    if (pMatrix.Rows > i && pMatrix.Columns > j)
+                    for (int j = 0; j < Columns; j++)
                     {
-                        val = pMatrix.Data[i * pMatrix.Columns + j];
+                        float val = 0;
+                        if (pMatrix.Rows > i && pMatrix.Columns > j)
+                        {
+                            val = pMatrix.Data[i * pMatrix.Columns + j];
+                        }
+                        Data[i * Columns + j] *= val;
                     }
-                    Data[i * Columns + j] *= val;
                 }
+            }
+            else
+            {
+                throw new Exception("The Matrix size must match with the size of sent pMatrix.");
             }
         }
 
@@ -195,30 +206,6 @@ namespace IA
                     Data[i * Columns + j] *= pValue;
                 }
             }
-        }
-
-        /// <summary>
-        /// Multiplie deux matrices et renvoies le résultat dans une nouvelle matrice de la taille de m1.
-        /// </summary>
-        /// <param name="m1">Première matrice.</param>
-        /// <param name="m2">Deuxième matrice.</param>
-        /// <returns>Matrice de taille identique à m1 et résultante de la multiplication de m1 et m2 (valeur par valeur).</returns>
-        public static Matrix Multiply(Matrix m1, Matrix m2)
-        {
-            Matrix result = new Matrix(m1.Rows, m1.Columns);
-            for (int i = 0; i < m1.Rows; i++)
-            {
-                for (int j = 0; j < m1.Columns; j++)
-                {
-                    float val = 0;
-                    if (m2.Rows > i && m2.Columns > j)
-                    {
-                        val = m2.Data[i * m2.Columns + j];
-                    }
-                    result.Data[i * result.Columns + j] = m1.Data[i * m1.Columns + j] * val;
-                }
-            }
-            return result;
         }
 
         /// <summary>
@@ -256,14 +243,13 @@ namespace IA
             }
         }
 
-
         /// <summary>
-        /// Retourne une nouvelle matrice correspondant au produit de deux matrices.
+        /// Retourne une nouvelle matrice correspondant au produit matriciel des deux matrices.
         /// </summary>
         /// <param name="m1">Matrice qui doit avoir autant de colones que ce que m2 a de lignes.</param>
         /// <param name="m2">Matrice qui doit avoir autant de lignes que ce que m1 a de colones.</param>
         /// <returns>Nouvelle matrice correspondant au résultat de l'opération.</returns>
-        public static Matrix Product(Matrix m1, Matrix m2)
+        public static Matrix DotProduct(Matrix m1, Matrix m2)
         {
             if (m1.Columns == m2.Rows)
             {
@@ -334,14 +320,8 @@ namespace IA
         /// <returns>Matrice résultante de la transposition de la matrice passée en paramètre.</returns>
         public static Matrix Transpose(Matrix pMatrix)
         {
-            Matrix result = new Matrix(pMatrix.Columns, pMatrix.Rows);
-            for (int i = 0; i < result.Rows; i++)
-            {
-                for (int j = 0; j < result.Columns; j++)
-                {
-                    result.Data[i * result.Columns + j] = pMatrix.Data[j * pMatrix.Columns + i];
-                }
-            }
+            Matrix result = pMatrix.Copy();
+            result.Transpose();
             return result;
         }
 
@@ -350,15 +330,119 @@ namespace IA
         /// </summary>
         public void Transpose()
         {
-            float[] newData = new float[Rows * Columns];
-            for (int i = 0; i < Columns; i++)
+            Matrix result = new Matrix(Columns, Rows);
+            for (int i = 0; i < result.Rows; i++)
             {
-                for (int j = 0; j < Rows; j++)
+                for (int j = 0; j < result.Columns; j++)
                 {
-                    newData[i * Columns + j] = Data[j * Columns + i];
+                    result.Data[i * result.Columns + j] = Data[j * Columns + i];
                 }
             }
-            Data = newData;
+            Data = result.Data;
+            Rows = result.Rows;
+            Columns = result.Columns;
+        }
+
+        /// <summary>
+        /// Retourne une nouvelle matrice correspondant au résultat de la réflection (symétrie) de la matrice passée en paramètre.
+        /// </summary>
+        /// <param name="pMatrix">Matrice contenant les données sur lesquels doivent être fait la symétrie.</param>
+        /// <param name="direction">Type de symétrie.</param>
+        /// <returns>Matrice résultante de la réflection (symétrie) de la matrice passée en paramètre.</returns>
+        public static Matrix Reflection(Matrix pMatrix, eDirection direction)
+        {
+            Matrix result = pMatrix.Copy();
+            result.Reflection(direction);
+            return result;
+        }
+
+        /// <summary>
+        /// Effectue une symétrie sur la matrice.
+        /// </summary>
+        /// <param name="direction">Sens de la symétrie à appliquer.</param>
+        public void Reflection(eDirection direction)
+        {
+            float[] newData = new float[Rows * Columns];
+            switch (direction)
+            {
+                case eDirection.Vertical:
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            newData[i * Columns + Columns - j - 1] = Data[i * Columns + j];
+                        }
+                    }
+                    Data = newData;
+                    break;
+                case eDirection.Horizontal:
+                    for (int i = 0; i < Rows; i++)
+                    {
+                        for (int j = 0; j < Columns; j++)
+                        {
+                            newData[(Rows - i - 1) * Columns + j] = Data[i * Columns + j];
+                        }
+                    }
+                    Data = newData;
+                    break;
+                default:
+                    throw new Exception("This case of reflection isn't supported.");
+            }
+        }
+
+        /// <summary>
+        /// Retourne une nouvelle matrice correspondant au résultat de la rotation de la matrice passée en paramètre.
+        /// </summary>
+        /// <param name="pMatrix">Matrice contenant les données qui doivent être pivotées.</param>
+        /// <param name="rotation">Rotation à effectuer.</param>
+        /// <returns>Matrice résultante de la rotation de la matrice passée en paramètre.</returns>
+        public static Matrix Rotate(Matrix pMatrix, eRotation rotation)
+        {
+            Matrix result = pMatrix.Copy();
+            result.Rotate(rotation);
+            return result;
+        }
+
+        /// <summary>
+        /// Effectue une rotation de la matrice.
+        /// </summary>
+        /// <param name="rotation">Rotation à effectuer.</param>
+        public void Rotate(eRotation rotation)
+        {
+            switch (rotation)
+            {
+                case eRotation.Rotation90:
+                    Transpose();
+                    Reflection(eDirection.Horizontal);
+                    break;
+                case eRotation.Rotation180:
+                    float[] newData = new float[Rows * Columns];
+                    for (int i = 0; i < Data.Length; i++)
+                    {
+                        newData[Data.Length - i - 1] = Data[i];
+                    }
+                    Data = newData;
+                    break;
+                case eRotation.Rotation270:
+                    Transpose();
+                    Reflection(eDirection.Vertical);
+                    break;
+                default:
+                    throw new Exception("This case of rotation isn't supported.");
+            }
+        }
+
+        /// <summary>
+        /// Retourne une nouvelle matrice correspond au résultat de l'exécution de la fonction donnée sur la matrice passée en paramètre.
+        /// </summary>
+        /// <param name="pMatrix">Matrice contenant les données qui doivent passer dans la fonction.</param>
+        /// <param name="function">Fonction à appliquer sur la matrice.</param>
+        /// <returns>Matrice correspondante au résultat de l'exécution de la fonction sur la matrice passée en paramètre.</returns>
+        public static Matrix ExecuteOnMatrix(Matrix pMatrix, FunctionOnMatrix function)
+        {
+            Matrix result = pMatrix.Copy();
+            result.ExecuteOnMatrix(function);
+            return result;
         }
 
         /// <summary>
@@ -378,46 +462,26 @@ namespace IA
         }
 
         /// <summary>
-        /// Retourne une nouvelle matrice correspond au résultat de l'exécution de la fonction donnée sur la matrice passée en paramètre.
+        /// Transforme une matrice en une matrice d'une dimension (mets toutes les valeurs à la suite).
         /// </summary>
-        /// <param name="pMatrix">Matrice contenant les données qui doivent passer dans la fonction.</param>
-        /// <param name="function">Fonction à appliquer sur la matrice.</param>
-        /// <returns>Matrice correspondante au résultat de l'exécution de la fonction sur la matrice passée en paramètre.</returns>
-        public static Matrix ExecuteOnMatrix(Matrix pMatrix, FunctionOnMatrix function)
+        /// <param name="pMatrix">Matrix source, contenant les données.</param>
+        /// <param name="direction">Sens du vecteur (Horizontal = 1 Ligne / Vertical = 1 Colonne).</param>
+        /// <returns>Matrix d'une dimension contenant les données mises à plat de la matrice passée en paramètre.</returns>
+        public static Matrix ToVector(Matrix pMatrix, eDirection direction)
         {
-            Matrix result = new Matrix(pMatrix.Rows, pMatrix.Columns);
-            for (int i = 0; i < result.Rows; i++)
+            Matrix result;
+            switch (direction)
             {
-                for (int j = 0; j < result.Columns; j++)
-                {
-                    float val = pMatrix.Data[i * pMatrix.Columns + j];
-                    result.Data[i * result.Columns + j] = function(val, i, j);
-                }
+                case eDirection.Vertical:
+                    result = new Matrix(pMatrix.Data.Length, 1);
+                    break;
+                case eDirection.Horizontal:
+                    result = new Matrix(1, pMatrix.Data.Length);
+                    break;
+                default:
+                    throw new Exception("This case of direction isn't supported.");
             }
-            return result;
-        }
-
-        /// <summary>
-        /// Transforme une matrice en une matrice d'une colonne (mets toutes les valeurs à la suite).
-        /// </summary>
-        /// <param name="pMatrix">Matrix source, contenant les données.</param>
-        /// <returns>Matrix d'une colonne contenant les données mises à plat de la matrice passée en paramètre.</returns>
-        public static Matrix ToVerticalVector(Matrix pMatrix)
-        {
-            Matrix result = new Matrix(pMatrix.Data.Length, 1);
-            result.Data = pMatrix.Data;
-            return result;
-        }
-
-        /// <summary>
-        /// Transforme une matrice en une matrice d'une ligne (mets toutes les valeurs à la suite).
-        /// </summary>
-        /// <param name="pMatrix">Matrix source, contenant les données.</param>
-        /// <returns>Matrix d'une ligne contenant les données mises à plat de la matrice passée en paramètre.</returns>
-        public static Matrix ToHorizontalVector(Matrix pMatrix)
-        {
-            Matrix result = new Matrix(1, pMatrix.Data.Length);
-            result.Data = pMatrix.Data;
+            pMatrix.Data.CopyTo(result.Data, 0);
             return result;
         }
 
@@ -449,6 +513,10 @@ namespace IA
             return result;
         }
 
+        /// <summary>
+        /// Effectue une copie de la matrice.
+        /// </summary>
+        /// <returns>Retourne la matrice copiée.</returns>
         public Matrix Copy()
         {
             Matrix result = new Matrix(Rows, Columns);

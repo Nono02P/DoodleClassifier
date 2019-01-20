@@ -15,7 +15,7 @@ namespace DoodleClassifier
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            
+
             //Application.Run(new Draw());
 
             /* Pour exécuter le formulaire "Doodle" qui sert à créer et entrainer un réseau de neurone à reconnaitre des dessins,
